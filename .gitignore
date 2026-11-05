@@ -1,0 +1,28 @@
+# STM32CubeIDE build output
+Debug/
+Release/
+*.o
+*.d
+*.elf
+*.map
+*.su
+*.list
+*.bin
+*.hex
+*.cyclo
+
+# IDE workspace / local settings
+.metadata/
+.settings/language.settings.xml
+*.launch
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Report build files (keep only the final PDF)
+*.docx#
+~$*.docx

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Two-Road Traffic Light System | CO3009</title>
+<meta name="description" content="CO3009 course project: a two-road traffic light controller on the XNUCLEO-F103RB board, running on an O(1) cooperative scheduler.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E4E6E1; --surface:#F3F4F0; --ink:#1C2B33; --muted:#53616A; --rule:#C3C8C1;
+  --lane:#F2B705; --red:#D62839; --amber:#F28C0F; --green:#12A150;
+  --housing:#24323A; --lamp-off:#3A474F;
+  --lcd:#9DBF3B; --lcd-ink:#1E2A10; --lcd-frame:#2E3C44;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#1D2125; --surface:#262B30; --ink:#E7E9E4; --muted:#A3ACA6; --rule:#3B4248;
+    --housing:#11171B; --lamp-off:#2C353B; --lcd-frame:#11171B;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:400 1.0625rem/1.6 "Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+a{color:inherit; text-decoration-color:var(--lane); text-decoration-thickness:2px; text-underline-offset:3px}
+a:hover{text-decoration-color:currentColor}
+:focus-visible{outline:3px solid var(--lane); outline-offset:3px}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:700; line-height:1.05; margin:0}
+h1{font-size:clamp(2.6rem,6vw,4.4rem); letter-spacing:-.01em}
+h2{font-size:clamp(1.8rem,3.4vw,2.4rem); margin-bottom:.75rem}
+h3{font-size:1.35rem; font-weight:600}
+p{margin:0 0 1rem}
+.wrap{max-width:1120px; margin:0 auto; padding:0 1.5rem}
+
+/* lane marking: the one decorative device, used as section dividers */
+.lane{height:6px; background:repeating-linear-gradient(90deg,var(--lane) 0 48px,transparent 48px 80px); opacity:.85}
+
+/* hero */
+.hero{display:grid; grid-template-columns:1.05fr 1fr; gap:3rem; align-items:center; padding:4.5rem 0 4rem}
+.hero .course{color:var(--muted); font-weight:500; margin-bottom:1rem}
+.hero .lead{font-size:1.2rem; max-width:34rem; margin-top:1.25rem}
+.actions{display:flex; flex-wrap:wrap; gap:.75rem; margin-top:1.75rem}
+.btn{display:inline-block; padding:.7rem 1.2rem; border-radius:6px; font-weight:600; text-decoration:none; border:2px solid var(--ink)}
+.btn.primary{background:var(--ink); color:var(--bg)}
+.btn:hover{background:var(--lane); border-color:var(--lane); color:#1C2B33}
+
+/* intersection panel */
+.panel{background:var(--surface); border:1px solid var(--rule); border-radius:14px; padding:1.75rem 1.5rem 1.25rem}
+.heads{display:flex; justify-content:center; gap:2.5rem; align-items:flex-start}
+.head{display:flex; flex-direction:column; align-items:center; gap:.5rem}
+.housing{background:var(--housing); border-radius:22px; padding:12px; display:grid; gap:10px}
+.lamp{width:52px; height:52px; border-radius:50%; background:var(--lamp-off); transition:background .15s, box-shadow .15s}
+.lamp.on.r{background:var(--red); box-shadow:0 0 22px var(--red)}
+.lamp.on.a{background:var(--amber); box-shadow:0 0 22px var(--amber)}
+.lamp.on.g{background:var(--green); box-shadow:0 0 22px var(--green)}
+.road{font-weight:600; color:var(--muted); font-size:.95rem}
+.lcd{margin:1.5rem auto 0; max-width:340px; background:var(--lcd-frame); border-radius:8px; padding:10px}
+.lcd pre{margin:0; background:var(--lcd); color:var(--lcd-ink); font:1.7rem/1.05 "VT323","Courier New",monospace; padding:.5rem .7rem; border-radius:3px; white-space:pre; overflow:hidden}
+.controls{display:flex; justify-content:center; gap:.5rem; margin-top:1rem}
+.controls button{font:600 .95rem "Barlow",sans-serif; padding:.45rem .9rem; border-radius:6px; border:1px solid var(--rule); background:transparent; color:var(--ink); cursor:pointer}
+.controls button:hover{border-color:var(--ink)}
+.note{text-align:center; color:var(--muted); font-size:.9rem; margin:.75rem 0 0}
+
+section.wrap{padding-top:4rem; padding-bottom:4rem}
+.intro{max-width:44rem; color:var(--muted)}
+
+/* modes */
+.modes{display:grid; grid-template-columns:repeat(2,1fr); gap:2rem 3rem; margin-top:2rem}
+.mode{border-left:5px solid var(--c); padding-left:1.1rem}
+.mode h3{margin-bottom:.35rem}
+.mode p{margin:0; max-width:30rem}
+
+/* layer stack, built bottom-up */
+.stack{display:flex; flex-direction:column-reverse; gap:6px; margin-top:2rem; max-width:760px}
+.layer{display:grid; grid-template-columns:3rem 1fr; gap:1rem; align-items:baseline; background:var(--surface); border:1px solid var(--rule); padding:1rem 1.25rem; border-radius:6px}
+.layer:nth-child(1){margin-left:0}
+.layer:nth-child(2){margin-left:1.25rem}
+.layer:nth-child(3){margin-left:2.5rem}
+.layer:nth-child(4){margin-left:3.75rem}
+.layer .n{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:1.8rem; color:var(--muted)}
+.layer h3{margin-bottom:.2rem}
+.layer p{margin:0; color:var(--muted)}
+.layer code{font-size:.9em}
+
+/* roadmap */
+.timeline{list-style:none; margin:2rem 0 0; padding:0; display:grid; grid-template-columns:repeat(5,1fr); gap:1rem}
+.timeline li{border-top:4px solid var(--rule); padding-top:.9rem}
+.timeline li.now{border-top-color:var(--lane)}
+.timeline .wk{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:1.3rem}
+.timeline p{margin:.25rem 0 0; font-size:.98rem; color:var(--muted)}
+
+/* tables */
+.tables{display:grid; grid-template-columns:1fr 1fr; gap:3rem; margin-top:2rem}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:.98rem}
+th,td{text-align:left; padding:.55rem .75rem; border-bottom:1px solid var(--rule)}
+th{font-weight:600; color:var(--muted)}
+caption{text-align:left; font-family:"Barlow Condensed",sans-serif; font-weight:600; font-size:1.3rem; padding-bottom:.5rem}
+td.tbd{color:var(--muted)}
+
+footer{padding:2.5rem 0 3rem; color:var(--muted); font-size:.95rem}
+footer .wrap{display:flex; flex-wrap:wrap; justify-content:space-between; gap:1rem}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr; padding-top:3rem; gap:2.5rem}
+  .modes,.tables{grid-template-columns:1fr}
+  .timeline{grid-template-columns:1fr 1fr}
+  .layer:nth-child(n){margin-left:0}
+}
+@media (max-width:480px){
+  .timeline{grid-template-columns:1fr}
+  .lamp{width:44px; height:44px}
+  .lcd pre{font-size:1.4rem}
+}
+@media (prefers-reduced-motion:reduce){ .lamp{transition:none} }
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <div>
+    <p class="course">CO3009 Microprocessors – Microcontrollers, HCMUT, Semester 1 2026–2027</p>
+    <h1>Two-road traffic light system on the <span style="white-space:nowrap">XNUCLEO-F103RB</span></h1>
+    <p class="lead">An STM32F103RB controller for a two-road intersection with automatic, manual and timing-adjustment modes, live temperature and humidity on an I2C LCD, and every task run by an O(1) cooperative scheduler.</p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/tapstoptap/MCU-MPU-Project">View source on GitHub</a>
+      <a class="btn" href="#architecture">How it is built</a>
+    </div>
+  </div>
+
+  <div class="panel" aria-label="Automatic mode preview">
+    <div class="heads">
+      <div class="head">
+        <div class="housing" id="road1"><div class="lamp r"></div><div class="lamp a"></div><div class="lamp g"></div></div>
+        <span class="road">Road 1</span>
+      </div>
+      <div class="head">
+        <div class="housing" id="road2"><div class="lamp r"></div><div class="lamp a"></div><div class="lamp g"></div></div>
+        <span class="road">Road 2</span>
+      </div>
+    </div>
+    <div class="lcd"><pre id="lcd" aria-live="polite">AUTO  R1  G2
+T1:05 T2:03</pre></div>
+    <div class="controls">
+      <button type="button" id="toggle">Pause</button>
+      <button type="button" id="next">Next state</button>
+    </div>
+    <p class="note">Automatic mode with Red 5 s, Green 3 s, Amber 2 s.</p>
+  </div>
+</header>
+
+<div class="lane" aria-hidden="true"></div>
+
+<section class="wrap" id="modes">
+  <h2>What the system does</h2>
+  <p class="intro">Three operating modes share the same two signal heads, selected from an LCD menu with the push buttons. The two roads are never green at the same time, including during mode changes.</p>
+  <div class="modes">
+    <div class="mode" style="--c:var(--green)">
+      <h3>Automatic</h3>
+      <p>Both roads cycle Red, Green and Amber in turn using the configured durations, driven by software timers.</p>
+    </div>
+    <div class="mode" style="--c:var(--amber)">
+      <h3>Manual</h3>
+      <p>The operator steps the intersection through its light states with push buttons.</p>
+    </div>
+    <div class="mode" style="--c:var(--red)">
+      <h3>Timing adjustment</h3>
+      <p>Pick a light, raise or lower its duration, confirm. Invalid combinations are rejected and the LCD shows the value being edited.</p>
+    </div>
+    <div class="mode" style="--c:var(--lcd)">
+      <h3>Environment display</h3>
+      <p>A DHT20 sensor is read over I2C at a fixed period and the temperature and humidity appear on the LCD.</p>
+    </div>
+  </div>
+</section>
+
+<div class="lane" aria-hidden="true"></div>
+
+<section class="wrap" id="architecture">
+  <h2>How it is built</h2>
+  <p class="intro">The firmware is built bottom-up, one layer at a time, and each layer is tested before the next one is added. Only the module layer touches the HAL.</p>
+  <div class="stack">
+    <div class="layer"><span class="n">1</span><div><h3>Hardware</h3><p>STM32F103RB, two light modules on D3–D6, four buttons on D7–D10, DHT20 and LCD on I2C1, TIM2 tick every 10 ms.</p></div></div>
+    <div class="layer"><span class="n">2</span><div><h3>O(1) scheduler</h3><p>Delta-sorted task list so <code>SCH_Update</code> only checks the head task. Supports periodic and one-shot tasks.</p></div></div>
+    <div class="layer"><span class="n">3</span><div><h3>Supporting modules</h3><p>Software timer, debounced buttons, traffic light driver, DHT20 and LCD drivers, each as a <code>.h/.c</code> pair.</p></div></div>
+    <div class="layer"><span class="n">4</span><div><h3>State machines</h3><p><code>fsm_automatic</code>, <code>fsm_manual</code>, <code>fsm_tuning</code> and a mode switcher, running as scheduler tasks with no direct hardware access.</p></div></div>
+  </div>
+</section>
+
+<div class="lane" aria-hidden="true"></div>
+
+<section class="wrap" id="roadmap">
+  <h2>Progress</h2>
+  <p class="intro">Report and source code are due 04/12/2026, followed by a live demo in week 15 or 16.</p>
+  <ol class="timeline">
+    <li class="now"><span class="wk">Week 1</span><p>Repository, CubeIDE project, hardware tests and I2C scan</p></li>
+    <li><span class="wk">Week 2</span><p>Scheduler with one-shot tasks, tested at head, middle and tail</p></li>
+    <li><span class="wk">Week 3</span><p>Timer, buttons, lights, DHT20 and LCD modules</p></li>
+    <li><span class="wk">Week 4</span><p>The three state machines and mode switching</p></li>
+    <li><span class="wk">Week 5</span><p>System testing, report and the <code>v1.0-final</code> tag</p></li>
+  </ol>
+</section>
+
+<div class="lane" aria-hidden="true"></div>
+
+<section class="wrap" id="hardware">
+  <h2>Wiring</h2>
+  <div class="tables">
+    <div class="scroll">
+      <table>
+        <caption>Devices</caption>
+        <thead><tr><th>Device</th><th>Header</th></tr></thead>
+        <tbody>
+          <tr><td>Traffic light module 1</td><td>D3, D4</td></tr>
+          <tr><td>Traffic light module 2</td><td>D5, D6</td></tr>
+          <tr><td>Button module 1</td><td>D7, D8</td></tr>
+          <tr><td>Button module 2</td><td>D9, D10</td></tr>
+          <tr><td>DHT20 and LCD</td><td>I2C slot (red)</td></tr>
+          <tr><td>On-board LEDs, USER button</td><td>PA5, PC9, PC13</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="scroll">
+      <table>
+        <caption>Pin mapping</caption>
+        <thead><tr><th>Header</th><th>STM32 pin</th><th>Label</th></tr></thead>
+        <tbody>
+          <tr><td>D3</td><td class="tbd">from schematic</td><td>TL1_A</td></tr>
+          <tr><td>D4</td><td class="tbd">from schematic</td><td>TL1_B</td></tr>
+          <tr><td>D5</td><td class="tbd">from schematic</td><td>TL2_A</td></tr>
+          <tr><td>D6</td><td class="tbd">from schematic</td><td>TL2_B</td></tr>
+          <tr><td>D7</td><td class="tbd">from schematic</td><td>BTN_1</td></tr>
+          <tr><td>D8</td><td class="tbd">from schematic</td><td>BTN_2</td></tr>
+          <tr><td>D9</td><td class="tbd">from schematic</td><td>BTN_3</td></tr>
+          <tr><td>D10</td><td class="tbd">from schematic</td><td>BTN_4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="lane" aria-hidden="true"></div>
+
+<section class="wrap" id="team">
+  <h2>Team</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Name</th><th>Student ID</th><th>GitHub</th></tr></thead>
+      <tbody>
+        <tr><td class="tbd">Member 1</td><td class="tbd">…</td><td><a href="https://github.com/tapstoptap">tapstoptap</a></td></tr>
+        <tr><td class="tbd">Member 2</td><td class="tbd">…</td><td class="tbd">…</td></tr>
+        <tr><td class="tbd">Member 3</td><td class="tbd">…</td><td class="tbd">…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>CO3009 course project, Faculty of Computer Science and Engineering, HCMUT</span>
+    <a href="https://github.com/tapstoptap/MCU-MPU-Project">github.com/tapstoptap/MCU-MPU-Project</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var T = {red:5, green:3, amber:2};
+  var states = [
+    {r1:'r', r2:'g', d:T.green, t:'R1  G2'},
+    {r1:'r', r2:'a', d:T.amber, t:'R1  A2'},
+    {r1:'g', r2:'r', d:T.green, t:'G1  R2'},
+    {r1:'a', r2:'r', d:T.amber, t:'A1  R2'}
+  ];
+  var i = 0, left = states[0].d, running = true, timer = null;
+  var road1 = document.getElementById('road1'), road2 = document.getElementById('road2');
+  var lcd = document.getElementById('lcd'), toggle = document.getElementById('toggle');
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function setHead(el, c){
+    el.querySelectorAll('.lamp').forEach(function(l){ l.classList.toggle('on', l.classList.contains(c)); });
+  }
+  function render(){
+    var s = states[i];
+    setHead(road1, s.r1); setHead(road2, s.r2);
+    // remaining time per road: the red road waits for the other road's green + amber
+    var t1, t2;
+    if (i === 0){ t1 = left + T.amber; t2 = left; }
+    else if (i === 1){ t1 = left; t2 = left; }
+    else if (i === 2){ t1 = left; t2 = left + T.amber; }
+    else { t1 = left; t2 = left; }
+    lcd.textContent = 'AUTO  ' + s.t + '\nT1:' + pad(t1) + ' T2:' + pad(t2);
+  }
+  function step(){ i = (i + 1) % states.length; left = states[i].d; render(); }
+  function tick(){ left--; if (left <= 0) step(); else render(); }
+  function start(){ timer = setInterval(tick, 1000); running = true; toggle.textContent = 'Pause'; }
+  function stop(){ clearInterval(timer); running = false; toggle.textContent = 'Resume'; }
+
+  toggle.addEventListener('click', function(){ running ? stop() : start(); });
+  document.getElementById('next').addEventListener('click', function(){ step(); });
+
+  render();
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) stop(); else start();
+})();
+</script>
+</body>
+</html>
