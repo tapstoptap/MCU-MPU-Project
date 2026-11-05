@@ -8,155 +8,206 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚦</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&family=VT323&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#E4E6E1; --surface:#F3F4F0; --ink:#1C2B33; --muted:#53616A; --rule:#C3C8C1;
-  --lane:#F2B705; --red:#D62839; --amber:#F28C0F; --green:#12A150;
-  --housing:#24323A; --lamp-off:#3A474F;
-  --lcd:#9DBF3B; --lcd-ink:#1E2A10; --lcd-frame:#2E3C44;
+  --bg:#EEF0EA; --surface:#FFFFFF; --ink:#16232B; --muted:#4E5D66; --rule:#CDD3CB;
+  --lane:#FFC400; --red:#FF2D46; --amber:#FF9500; --green:#00D26A; --blue:#2E8BFF; --lime:#B6E23A;
+  --asphalt:#1E262D; --asphalt-2:#2B353E; --on-asphalt:#EEF2F4; --on-asphalt-muted:#A9B6BE;
+  --housing:#0F1519; --lamp-off:#28323A;
+  --lcd:#A6D63C; --lcd-ink:#1A2A08; --lcd-frame:#0F1519;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
-  :root{
-    --bg:#1D2125; --surface:#262B30; --ink:#E7E9E4; --muted:#A3ACA6; --rule:#3B4248;
-    --housing:#11171B; --lamp-off:#2C353B; --lcd-frame:#11171B;
+  :root:not([data-theme="light"]){
+    --bg:#151A1F; --surface:#1F262C; --ink:#EEF1EC; --muted:#A7B1AB; --rule:#343D44;
+    --asphalt:#0E1316; --asphalt-2:#1B2329;
     color-scheme:dark;
   }
 }
+:root[data-theme="dark"]{
+  --bg:#151A1F; --surface:#1F262C; --ink:#EEF1EC; --muted:#A7B1AB; --rule:#343D44;
+  --asphalt:#0E1316; --asphalt-2:#1B2329; color-scheme:dark;
+}
 *{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth}
 body{
   margin:0; background:var(--bg); color:var(--ink);
   font:400 1.0625rem/1.6 "Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 a{color:inherit; text-decoration-color:var(--lane); text-decoration-thickness:2px; text-underline-offset:3px}
 a:hover{text-decoration-color:currentColor}
 :focus-visible{outline:3px solid var(--lane); outline-offset:3px}
-h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:700; line-height:1.05; margin:0}
-h1{font-size:clamp(2.6rem,6vw,4.4rem); letter-spacing:-.01em}
-h2{font-size:clamp(1.8rem,3.4vw,2.4rem); margin-bottom:.75rem}
-h3{font-size:1.35rem; font-weight:600}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:700; line-height:1.02; margin:0}
+h1{font-size:clamp(2.6rem,5.6vw,4.6rem); font-weight:800; letter-spacing:-.01em}
+h2{font-size:clamp(2rem,3.8vw,2.8rem); margin-bottom:.75rem}
+h3{font-size:1.4rem; font-weight:600}
 p{margin:0 0 1rem}
-.wrap{max-width:1120px; margin:0 auto; padding:0 1.5rem}
+code{font-size:.9em}
+.wrap{max-width:1160px; margin:0 auto; padding-left:1.5rem; padding-right:1.5rem}
 
-/* lane marking: the one decorative device, used as section dividers */
-.lane{height:6px; background:repeating-linear-gradient(90deg,var(--lane) 0 48px,transparent 48px 80px); opacity:.85}
+/* ---------- hero: an asphalt band with the live intersection ---------- */
+.hero-band{
+  background:
+    radial-gradient(60% 80% at 85% 30%, rgba(0,210,106,.18), transparent 60%),
+    radial-gradient(50% 70% at 70% 90%, rgba(255,45,70,.16), transparent 60%),
+    var(--asphalt);
+  color:var(--on-asphalt);
+  padding-top:env(safe-area-inset-top,0px);
+  position:relative; overflow:hidden;
+}
+.hero{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:3rem; align-items:center; padding-top:4rem; padding-bottom:4.5rem}
+.hero .course{color:var(--on-asphalt-muted); font-weight:500; margin-bottom:1rem}
+.hero h1 .w{display:inline-block}
+.hero .lead{font-size:1.2rem; max-width:34rem; margin-top:1.4rem; color:var(--on-asphalt)}
+.actions{display:flex; flex-wrap:wrap; gap:.75rem; margin-top:1.9rem}
+.btn{display:inline-block; padding:.75rem 1.25rem; border-radius:8px; font-weight:600; text-decoration:none; border:2px solid var(--on-asphalt); color:var(--on-asphalt); transition:transform .15s, background .15s, color .15s, border-color .15s}
+.btn.primary{background:var(--lane); border-color:var(--lane); color:#16232B}
+.btn:hover{transform:translateY(-2px); background:var(--green); border-color:var(--green); color:#0B1A10}
 
-/* hero */
-.hero{display:grid; grid-template-columns:1.05fr 1fr; gap:3rem; align-items:center; padding:4.5rem 0 4rem}
-.hero .course{color:var(--muted); font-weight:500; margin-bottom:1rem}
-.hero .lead{font-size:1.2rem; max-width:34rem; margin-top:1.25rem}
-.actions{display:flex; flex-wrap:wrap; gap:.75rem; margin-top:1.75rem}
-.btn{display:inline-block; padding:.7rem 1.2rem; border-radius:6px; font-weight:600; text-decoration:none; border:2px solid var(--ink)}
-.btn.primary{background:var(--ink); color:var(--bg)}
-.btn:hover{background:var(--lane); border-color:var(--lane); color:#1C2B33}
+.stage{background:var(--asphalt-2); border-radius:18px; padding:1rem; box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.stage canvas{display:block; width:100%; aspect-ratio:1/1; border-radius:12px; background:#25303A}
+.dash{display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:1rem; flex-wrap:wrap}
+.heads{display:flex; gap:.9rem}
+.head{display:flex; flex-direction:column; align-items:center; gap:.3rem}
+.housing{background:var(--housing); border-radius:14px; padding:7px; display:grid; gap:6px}
+.lamp{width:26px; height:26px; border-radius:50%; background:var(--lamp-off); transition:background .2s, box-shadow .2s}
+.lamp.on.r{background:var(--red); box-shadow:0 0 18px 3px var(--red)}
+.lamp.on.a{background:var(--amber); box-shadow:0 0 18px 3px var(--amber)}
+.lamp.on.g{background:var(--green); box-shadow:0 0 18px 3px var(--green)}
+.road{font-weight:600; color:var(--on-asphalt-muted); font-size:.85rem}
+.lcd{background:var(--lcd-frame); border-radius:8px; padding:7px; flex:1; min-width:220px; max-width:300px}
+.lcd pre{margin:0; background:var(--lcd); color:var(--lcd-ink); font:1.55rem/1.02 "VT323","Courier New",monospace; padding:.45rem .6rem; border-radius:3px; white-space:pre; overflow:hidden; box-shadow:inset 0 0 14px rgba(26,42,8,.35)}
+.lcd pre .cur{animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.controls{display:flex; gap:.5rem; margin-top:.9rem}
+.controls button{font:600 .95rem "Barlow",sans-serif; padding:.45rem .9rem; border-radius:6px; border:1px solid #4A5862; background:transparent; color:var(--on-asphalt); cursor:pointer; transition:background .15s, border-color .15s}
+.controls button:hover{border-color:var(--lane); background:rgba(255,196,0,.12)}
+.controls .note{margin:0 0 0 auto; color:var(--on-asphalt-muted); font-size:.88rem; align-self:center}
 
-/* intersection panel */
-.panel{background:var(--surface); border:1px solid var(--rule); border-radius:14px; padding:1.75rem 1.5rem 1.25rem}
-.heads{display:flex; justify-content:center; gap:2.5rem; align-items:flex-start}
-.head{display:flex; flex-direction:column; align-items:center; gap:.5rem}
-.housing{background:var(--housing); border-radius:22px; padding:12px; display:grid; gap:10px}
-.lamp{width:52px; height:52px; border-radius:50%; background:var(--lamp-off); transition:background .15s, box-shadow .15s}
-.lamp.on.r{background:var(--red); box-shadow:0 0 22px var(--red)}
-.lamp.on.a{background:var(--amber); box-shadow:0 0 22px var(--amber)}
-.lamp.on.g{background:var(--green); box-shadow:0 0 22px var(--green)}
-.road{font-weight:600; color:var(--muted); font-size:.95rem}
-.lcd{margin:1.5rem auto 0; max-width:340px; background:var(--lcd-frame); border-radius:8px; padding:10px}
-.lcd pre{margin:0; background:var(--lcd); color:var(--lcd-ink); font:1.7rem/1.05 "VT323","Courier New",monospace; padding:.5rem .7rem; border-radius:3px; white-space:pre; overflow:hidden}
-.controls{display:flex; justify-content:center; gap:.5rem; margin-top:1rem}
-.controls button{font:600 .95rem "Barlow",sans-serif; padding:.45rem .9rem; border-radius:6px; border:1px solid var(--rule); background:transparent; color:var(--ink); cursor:pointer}
-.controls button:hover{border-color:var(--ink)}
-.note{text-align:center; color:var(--muted); font-size:.9rem; margin:.75rem 0 0}
+/* ---------- moving lane marking between sections ---------- */
+.lane{height:8px; background:repeating-linear-gradient(90deg,var(--lane) 0 52px,transparent 52px 88px); background-size:88px 8px; animation:drive 1.4s linear infinite}
+@keyframes drive{to{background-position:88px 0}}
 
-section.wrap{padding-top:4rem; padding-bottom:4rem}
-.intro{max-width:44rem; color:var(--muted)}
+section.wrap{padding-top:4.5rem; padding-bottom:4.5rem}
+.intro{max-width:44rem; color:var(--muted); font-size:1.1rem}
 
-/* modes */
-.modes{display:grid; grid-template-columns:repeat(2,1fr); gap:2rem 3rem; margin-top:2rem}
-.mode{border-left:5px solid var(--c); padding-left:1.1rem}
+/* ---------- modes ---------- */
+.modes{display:grid; grid-template-columns:repeat(2,1fr); gap:1.25rem; margin-top:2rem}
+.mode{position:relative; background:var(--surface); border-radius:12px; padding:1.4rem 1.4rem 1.4rem 1.6rem; overflow:hidden; border:1px solid var(--rule); transition:transform .2s, box-shadow .2s}
+.mode::before{content:""; position:absolute; left:0; top:0; bottom:0; width:6px; background:var(--c); transform:scaleY(0); transform-origin:top; transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.mode::after{content:""; position:absolute; inset:auto -40px -40px auto; width:140px; height:140px; border-radius:50%; background:var(--c); opacity:.12; transition:opacity .25s, transform .4s}
+.mode.in::before{transform:scaleY(1)}
+.mode:hover{transform:translateY(-3px); box-shadow:0 14px 30px -18px var(--c)}
+.mode:hover::after{opacity:.28; transform:scale(1.25)}
 .mode h3{margin-bottom:.35rem}
-.mode p{margin:0; max-width:30rem}
+.mode p{margin:0; max-width:30rem; color:var(--muted)}
 
-/* layer stack, built bottom-up */
-.stack{display:flex; flex-direction:column-reverse; gap:6px; margin-top:2rem; max-width:760px}
-.layer{display:grid; grid-template-columns:3rem 1fr; gap:1rem; align-items:baseline; background:var(--surface); border:1px solid var(--rule); padding:1rem 1.25rem; border-radius:6px}
-.layer:nth-child(1){margin-left:0}
-.layer:nth-child(2){margin-left:1.25rem}
-.layer:nth-child(3){margin-left:2.5rem}
-.layer:nth-child(4){margin-left:3.75rem}
-.layer .n{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:1.8rem; color:var(--muted)}
+/* ---------- layer stack, assembled bottom-up on scroll ---------- */
+.stack{display:flex; flex-direction:column-reverse; gap:8px; margin-top:2rem; max-width:780px}
+.layer{display:grid; grid-template-columns:3rem 1fr; gap:1rem; align-items:baseline; background:var(--surface); border:1px solid var(--rule); border-left:6px solid var(--c); padding:1rem 1.25rem; border-radius:8px}
+.layer:nth-child(1){--c:var(--blue)}
+.layer:nth-child(2){--c:var(--green); margin-left:1.25rem}
+.layer:nth-child(3){--c:var(--amber); margin-left:2.5rem}
+.layer:nth-child(4){--c:var(--red); margin-left:3.75rem}
+.layer .n{font-family:"Barlow Condensed",sans-serif; font-weight:800; font-size:2rem; color:var(--c)}
 .layer h3{margin-bottom:.2rem}
 .layer p{margin:0; color:var(--muted)}
-.layer code{font-size:.9em}
+.ticks{display:flex; gap:4px; margin-top:.6rem}
+.ticks i{flex:1; height:6px; border-radius:3px; background:var(--rule)}
+.ticks i.hit{background:var(--green); box-shadow:0 0 8px var(--green)}
 
-/* roadmap */
-.timeline{list-style:none; margin:2rem 0 0; padding:0; display:grid; grid-template-columns:repeat(5,1fr); gap:1rem}
-.timeline li{border-top:4px solid var(--rule); padding-top:.9rem}
-.timeline li.now{border-top-color:var(--lane)}
-.timeline .wk{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:1.3rem}
+/* ---------- roadmap ---------- */
+.timeline{list-style:none; margin:2.2rem 0 0; padding:0; display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; position:relative}
+.timeline li{padding-top:1.1rem; position:relative}
+.timeline li::before{content:""; position:absolute; top:0; left:0; right:0; height:5px; border-radius:3px; background:var(--rule)}
+.timeline li::after{content:""; position:absolute; top:0; left:0; height:5px; border-radius:3px; width:0; background:var(--c,var(--green)); transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.timeline.in li.done::after{width:100%}
+.timeline.in li.now::after{width:45%; background:var(--lane); animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 12px var(--lane)}}
+.timeline .wk{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:1.35rem}
 .timeline p{margin:.25rem 0 0; font-size:.98rem; color:var(--muted)}
 
-/* tables */
+/* ---------- tables ---------- */
 .tables{display:grid; grid-template-columns:1fr 1fr; gap:3rem; margin-top:2rem}
 .scroll{overflow-x:auto}
 table{border-collapse:collapse; width:100%; font-size:.98rem}
 th,td{text-align:left; padding:.55rem .75rem; border-bottom:1px solid var(--rule)}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(255,196,0,.14)}
 th{font-weight:600; color:var(--muted)}
-caption{text-align:left; font-family:"Barlow Condensed",sans-serif; font-weight:600; font-size:1.3rem; padding-bottom:.5rem}
+caption{text-align:left; font-family:"Barlow Condensed",sans-serif; font-weight:600; font-size:1.35rem; padding-bottom:.5rem}
 td.tbd{color:var(--muted)}
+.swatch{display:inline-block; width:.7rem; height:.7rem; border-radius:50%; margin-right:.5rem; vertical-align:middle}
 
-footer{padding:2.5rem 0 3rem; color:var(--muted); font-size:.95rem}
+footer{background:var(--asphalt); color:var(--on-asphalt-muted); padding:2.5rem 0 3rem; font-size:.95rem}
 footer .wrap{display:flex; flex-wrap:wrap; justify-content:space-between; gap:1rem}
+footer a{color:var(--on-asphalt)}
 
-@media (max-width:860px){
+/* ---------- one orchestrated page-load sequence ---------- */
+.js .hero .course, .js .hero h1 .w, .js .hero .lead, .js .hero .actions, .js .stage{opacity:0; transform:translateY(18px)}
+.js.loaded .hero .course, .js.loaded .hero h1 .w, .js.loaded .hero .lead, .js.loaded .hero .actions, .js.loaded .stage{
+  opacity:1; transform:none; transition:opacity .6s ease, transform .7s cubic-bezier(.2,.8,.2,1); transition-delay:var(--d,0s)}
+/* scroll reveal for the layer stack */
+.js .layer{opacity:0; transform:translateY(24px)}
+.js .stack.in .layer{opacity:1; transform:none; transition:opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1)}
+.js .stack.in .layer:nth-child(1){transition-delay:0s}
+.js .stack.in .layer:nth-child(2){transition-delay:.18s}
+.js .stack.in .layer:nth-child(3){transition-delay:.36s}
+.js .stack.in .layer:nth-child(4){transition-delay:.54s}
+
+@media (max-width:900px){
   .hero{grid-template-columns:1fr; padding-top:3rem; gap:2.5rem}
   .modes,.tables{grid-template-columns:1fr}
-  .timeline{grid-template-columns:1fr 1fr}
+  .timeline{grid-template-columns:1fr 1fr; row-gap:1.5rem}
   .layer:nth-child(n){margin-left:0}
 }
 @media (max-width:480px){
   .timeline{grid-template-columns:1fr}
-  .lamp{width:44px; height:44px}
-  .lcd pre{font-size:1.4rem}
+  .lcd pre{font-size:1.3rem}
+  .controls .note{margin-left:0; width:100%}
+  .controls{flex-wrap:wrap}
 }
-@media (prefers-reduced-motion:reduce){ .lamp{transition:none} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+  html{scroll-behavior:auto}
+}
 </style>
+<script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
 
+<div class="hero-band">
 <header class="wrap hero">
   <div>
-    <p class="course">CO3009 Microprocessors – Microcontrollers, HCMUT, Semester 1 2026–2027</p>
-    <h1>Two-road traffic light system on the <span style="white-space:nowrap">XNUCLEO-F103RB</span></h1>
-    <p class="lead">An STM32F103RB controller for a two-road intersection with automatic, manual and timing-adjustment modes, live temperature and humidity on an I2C LCD, and every task run by an O(1) cooperative scheduler.</p>
-    <div class="actions">
+    <p class="course" style="--d:0s">CO3009 Microprocessors – Microcontrollers, HCMUT, Semester 1 2026–2027</p>
+    <h1><span class="w" style="--d:.08s">Two-road</span> <span class="w" style="--d:.16s">traffic</span> <span class="w" style="--d:.24s">light</span> <span class="w" style="--d:.32s">system</span> <span class="w" style="--d:.4s">on the</span> <span class="w" style="--d:.48s">XNUCLEO-F103RB</span></h1>
+    <p class="lead" style="--d:.6s">An STM32F103RB controller for a two-road intersection with automatic, manual and timing-adjustment modes, live temperature and humidity on an I2C LCD, and every task run by an O(1) cooperative scheduler.</p>
+    <div class="actions" style="--d:.72s">
       <a class="btn primary" href="https://github.com/tapstoptap/MCU-MPU-Project">View source on GitHub</a>
       <a class="btn" href="#architecture">How it is built</a>
     </div>
   </div>
 
-  <div class="panel" aria-label="Automatic mode preview">
-    <div class="heads">
-      <div class="head">
-        <div class="housing" id="road1"><div class="lamp r"></div><div class="lamp a"></div><div class="lamp g"></div></div>
-        <span class="road">Road 1</span>
+  <div class="stage" style="--d:.3s" aria-label="Automatic mode preview: traffic moving through a two-road intersection">
+    <canvas id="junction" width="800" height="800"></canvas>
+    <div class="dash">
+      <div class="heads">
+        <div class="head"><div class="housing" id="road1"><div class="lamp r"></div><div class="lamp a"></div><div class="lamp g"></div></div><span class="road">Road 1</span></div>
+        <div class="head"><div class="housing" id="road2"><div class="lamp r"></div><div class="lamp a"></div><div class="lamp g"></div></div><span class="road">Road 2</span></div>
       </div>
-      <div class="head">
-        <div class="housing" id="road2"><div class="lamp r"></div><div class="lamp a"></div><div class="lamp g"></div></div>
-        <span class="road">Road 2</span>
-      </div>
-    </div>
-    <div class="lcd"><pre id="lcd" aria-live="polite">AUTO  R1  G2
+      <div class="lcd"><pre id="lcd" aria-live="off">AUTO  R1  G2
 T1:05 T2:03</pre></div>
+    </div>
     <div class="controls">
       <button type="button" id="toggle">Pause</button>
       <button type="button" id="next">Next state</button>
+      <p class="note">Red 5 s, Green 3 s, Amber 2 s</p>
     </div>
-    <p class="note">Automatic mode with Red 5 s, Green 3 s, Amber 2 s.</p>
   </div>
 </header>
+</div>
 
 <div class="lane" aria-hidden="true"></div>
 
@@ -164,19 +215,19 @@ T1:05 T2:03</pre></div>
   <h2>What the system does</h2>
   <p class="intro">Three operating modes share the same two signal heads, selected from an LCD menu with the push buttons. The two roads are never green at the same time, including during mode changes.</p>
   <div class="modes">
-    <div class="mode" style="--c:var(--green)">
+    <div class="mode reveal" style="--c:var(--green)">
       <h3>Automatic</h3>
       <p>Both roads cycle Red, Green and Amber in turn using the configured durations, driven by software timers.</p>
     </div>
-    <div class="mode" style="--c:var(--amber)">
+    <div class="mode reveal" style="--c:var(--amber)">
       <h3>Manual</h3>
       <p>The operator steps the intersection through its light states with push buttons.</p>
     </div>
-    <div class="mode" style="--c:var(--red)">
+    <div class="mode reveal" style="--c:var(--red)">
       <h3>Timing adjustment</h3>
       <p>Pick a light, raise or lower its duration, confirm. Invalid combinations are rejected and the LCD shows the value being edited.</p>
     </div>
-    <div class="mode" style="--c:var(--lcd)">
+    <div class="mode reveal" style="--c:var(--blue)">
       <h3>Environment display</h3>
       <p>A DHT20 sensor is read over I2C at a fixed period and the temperature and humidity appear on the LCD.</p>
     </div>
@@ -188,9 +239,9 @@ T1:05 T2:03</pre></div>
 <section class="wrap" id="architecture">
   <h2>How it is built</h2>
   <p class="intro">The firmware is built bottom-up, one layer at a time, and each layer is tested before the next one is added. Only the module layer touches the HAL.</p>
-  <div class="stack">
+  <div class="stack reveal">
     <div class="layer"><span class="n">1</span><div><h3>Hardware</h3><p>STM32F103RB, two light modules on D3–D6, four buttons on D7–D10, DHT20 and LCD on I2C1, TIM2 tick every 10 ms.</p></div></div>
-    <div class="layer"><span class="n">2</span><div><h3>O(1) scheduler</h3><p>Delta-sorted task list so <code>SCH_Update</code> only checks the head task. Supports periodic and one-shot tasks.</p></div></div>
+    <div class="layer"><span class="n">2</span><div><h3>O(1) scheduler</h3><p>Delta-sorted task list so <code>SCH_Update</code> only checks the head task. Supports periodic and one-shot tasks.</p><div class="ticks" id="ticks" aria-hidden="true"></div></div></div>
     <div class="layer"><span class="n">3</span><div><h3>Supporting modules</h3><p>Software timer, debounced buttons, traffic light driver, DHT20 and LCD drivers, each as a <code>.h/.c</code> pair.</p></div></div>
     <div class="layer"><span class="n">4</span><div><h3>State machines</h3><p><code>fsm_automatic</code>, <code>fsm_manual</code>, <code>fsm_tuning</code> and a mode switcher, running as scheduler tasks with no direct hardware access.</p></div></div>
   </div>
@@ -201,7 +252,7 @@ T1:05 T2:03</pre></div>
 <section class="wrap" id="roadmap">
   <h2>Progress</h2>
   <p class="intro">Report and source code are due 04/12/2026, followed by a live demo in week 15 or 16.</p>
-  <ol class="timeline">
+  <ol class="timeline reveal">
     <li class="now"><span class="wk">Week 1</span><p>Repository, CubeIDE project, hardware tests and I2C scan</p></li>
     <li><span class="wk">Week 2</span><p>Scheduler with one-shot tasks, tested at head, middle and tail</p></li>
     <li><span class="wk">Week 3</span><p>Timer, buttons, lights, DHT20 and LCD modules</p></li>
@@ -220,12 +271,12 @@ T1:05 T2:03</pre></div>
         <caption>Devices</caption>
         <thead><tr><th>Device</th><th>Header</th></tr></thead>
         <tbody>
-          <tr><td>Traffic light module 1</td><td>D3, D4</td></tr>
-          <tr><td>Traffic light module 2</td><td>D5, D6</td></tr>
-          <tr><td>Button module 1</td><td>D7, D8</td></tr>
-          <tr><td>Button module 2</td><td>D9, D10</td></tr>
-          <tr><td>DHT20 and LCD</td><td>I2C slot (red)</td></tr>
-          <tr><td>On-board LEDs, USER button</td><td>PA5, PC9, PC13</td></tr>
+          <tr><td><span class="swatch" style="background:var(--red)"></span>Traffic light module 1</td><td>D3, D4</td></tr>
+          <tr><td><span class="swatch" style="background:var(--red)"></span>Traffic light module 2</td><td>D5, D6</td></tr>
+          <tr><td><span class="swatch" style="background:var(--amber)"></span>Button module 1</td><td>D7, D8</td></tr>
+          <tr><td><span class="swatch" style="background:var(--amber)"></span>Button module 2</td><td>D9, D10</td></tr>
+          <tr><td><span class="swatch" style="background:var(--blue)"></span>DHT20 and LCD</td><td>I2C slot (red)</td></tr>
+          <tr><td><span class="swatch" style="background:var(--green)"></span>On-board LEDs, USER button</td><td>PA5, PC9, PC13</td></tr>
         </tbody>
       </table>
     </div>
@@ -273,6 +324,20 @@ T1:05 T2:03</pre></div>
 
 <script>
 (function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ root.classList.add('loaded'); }); });
+
+  /* ---------- scroll reveals ---------- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && !reduce){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, {threshold:.25});
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else { revealEls.forEach(function(el){ el.classList.add('in'); }); }
+
+  /* ---------- light cycle (automatic mode) ---------- */
   var T = {red:5, green:3, amber:2};
   var states = [
     {r1:'r', r2:'g', d:T.green, t:'R1  G2'},
@@ -283,32 +348,147 @@ T1:05 T2:03</pre></div>
   var i = 0, left = states[0].d, running = true, timer = null;
   var road1 = document.getElementById('road1'), road2 = document.getElementById('road2');
   var lcd = document.getElementById('lcd'), toggle = document.getElementById('toggle');
-
   function pad(n){ return (n < 10 ? '0' : '') + n; }
-  function setHead(el, c){
-    el.querySelectorAll('.lamp').forEach(function(l){ l.classList.toggle('on', l.classList.contains(c)); });
-  }
+  function setHead(el, c){ el.querySelectorAll('.lamp').forEach(function(l){ l.classList.toggle('on', l.classList.contains(c)); }); }
   function render(){
-    var s = states[i];
+    var s = states[i], t1 = left, t2 = left;
+    if (i === 0) t1 = left + T.amber;
+    if (i === 2) t2 = left + T.amber;
     setHead(road1, s.r1); setHead(road2, s.r2);
-    // remaining time per road: the red road waits for the other road's green + amber
-    var t1, t2;
-    if (i === 0){ t1 = left + T.amber; t2 = left; }
-    else if (i === 1){ t1 = left; t2 = left; }
-    else if (i === 2){ t1 = left; t2 = left + T.amber; }
-    else { t1 = left; t2 = left; }
-    lcd.textContent = 'AUTO  ' + s.t + '\nT1:' + pad(t1) + ' T2:' + pad(t2);
+    lcd.innerHTML = 'AUTO  ' + s.t + '\nT1:' + pad(t1) + ' T2:' + pad(t2) + '<span class="cur">_</span>';
   }
   function step(){ i = (i + 1) % states.length; left = states[i].d; render(); }
   function tick(){ left--; if (left <= 0) step(); else render(); }
   function start(){ timer = setInterval(tick, 1000); running = true; toggle.textContent = 'Pause'; }
   function stop(){ clearInterval(timer); running = false; toggle.textContent = 'Resume'; }
-
   toggle.addEventListener('click', function(){ running ? stop() : start(); });
-  document.getElementById('next').addEventListener('click', function(){ step(); });
-
+  document.getElementById('next').addEventListener('click', step);
   render();
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) stop(); else start();
+  if (!reduce) start(); else { running = false; toggle.textContent = 'Resume'; }
+
+  /* ---------- scheduler tick strip ---------- */
+  var ticksEl = document.getElementById('ticks'), N = 20, cells = [];
+  for (var k = 0; k < N; k++){ var c = document.createElement('i'); ticksEl.appendChild(c); cells.push(c); }
+  var tk = 0;
+  if (!reduce) setInterval(function(){
+    cells.forEach(function(c){ c.classList.remove('hit'); });
+    cells[tk % N].classList.add('hit');
+    if (tk % 5 === 0) cells[(tk + 10) % N].classList.add('hit');
+    tk++;
+  }, 120);
+
+  /* ---------- intersection animation ---------- */
+  var cv = document.getElementById('junction'), ctx = cv.getContext('2d');
+  var W = 400, S = 2;               // logical size 400, drawn at 2x
+  ctx.scale(S, S);
+  var C = 200, RW = 120, half = RW/2;           // road width 120 -> two lanes of 60
+  var lo = C - half, hi = C + half;             // intersection box 140..260
+  var LEN = 470, CAR = 28, GAP = 12, VMAX = 95, ACC = 160;
+  var palette = ['#FF2D46','#2E8BFF','#FFC400','#00D26A','#FF7AD9','#FFFFFF','#8C6CFF','#FF9500'];
+  // each lane: road (1 horizontal, 2 vertical), start point, direction, stop position along the path
+  var lanes = [
+    {road:1, x0:-35, y0:C+30, dx:1,  dy:0,  stop:lo-22+35},
+    {road:1, x0:W+35, y0:C-30, dx:-1, dy:0, stop:W+35-(hi+22)},
+    {road:2, x0:C-30, y0:-35, dx:0,  dy:1,  stop:lo-22+35},
+    {road:2, x0:C+30, y0:W+35, dx:0, dy:-1, stop:W+35-(hi+22)}
+  ];
+  lanes.forEach(function(l){ l.cars = []; l.next = Math.random()*1.5; });
+  function light(road){ return road === 1 ? states[i].r1 : states[i].r2; }
+
+  function update(dt){
+    lanes.forEach(function(l){
+      var sig = light(l.road);
+      l.next -= dt;
+      var last = l.cars[l.cars.length-1];
+      if (l.next <= 0 && (!last || last.s > CAR + GAP + 6) && l.cars.length < 7){
+        l.cars.push({s:0, v:VMAX*.8, col:palette[(Math.random()*palette.length)|0]});
+        l.next = 0.9 + Math.random()*1.8;
+      }
+      for (var k = 0; k < l.cars.length; k++){
+        var car = l.cars[k], limit = Infinity;
+        if (k > 0) limit = l.cars[k-1].s - CAR - GAP;
+        var before = car.s <= l.stop + 0.5;
+        var mustStop = sig === 'r' || (sig === 'a' && l.stop - car.s > 18);
+        if (before && mustStop) limit = Math.min(limit, l.stop);
+        var room = Math.max(0, limit - car.s);
+        var vTarget = Math.min(VMAX, Math.sqrt(2*ACC*room));
+        car.v += Math.max(-ACC*3*dt, Math.min(ACC*dt, vTarget - car.v));
+        car.s = Math.min(car.s + car.v*dt, limit === Infinity ? Infinity : Math.max(car.s, limit));
+      }
+      while (l.cars.length && l.cars[0].s > LEN + CAR) l.cars.shift();
+    });
+  }
+
+  function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  var sigCol = {r:'#FF2D46', a:'#FF9500', g:'#00D26A'};
+  var dashOffset = 0;
+
+  function drawScene(){
+    ctx.clearRect(0,0,W,W);
+    // ground blocks
+    ctx.fillStyle = '#25303A'; ctx.fillRect(0,0,W,W);
+    ctx.fillStyle = '#2F3C47';
+    [[0,0],[hi,0],[0,hi],[hi,hi]].forEach(function(p){ rr(p[0]+10,p[1]+10,lo-20,lo-20,14); ctx.fill(); });
+    // roads
+    ctx.fillStyle = '#3A4651';
+    ctx.fillRect(0,lo,W,RW); ctx.fillRect(lo,0,RW,W);
+    // centre dashes (moving with traffic of the green road)
+    ctx.strokeStyle = '#FFC400'; ctx.lineWidth = 3; ctx.setLineDash([16,14]);
+    ctx.lineDashOffset = -dashOffset;
+    ctx.beginPath(); ctx.moveTo(0,C); ctx.lineTo(lo-14,C); ctx.moveTo(hi+14,C); ctx.lineTo(W,C);
+    ctx.moveTo(C,0); ctx.lineTo(C,lo-14); ctx.moveTo(C,hi+14); ctx.lineTo(C,W); ctx.stroke();
+    ctx.setLineDash([]);
+    // crosswalks
+    ctx.fillStyle = 'rgba(255,255,255,.55)';
+    for (var z = lo+6; z < hi-4; z += 12){
+      ctx.fillRect(lo-14,z,10,7); ctx.fillRect(hi+4,z,10,7);
+      ctx.fillRect(z,lo-14,7,10); ctx.fillRect(z,hi+4,7,10);
+    }
+    // stop lines coloured by each road's signal
+    var s1 = sigCol[light(1)], s2 = sigCol[light(2)];
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 14;
+    ctx.strokeStyle = s1; ctx.shadowColor = s1;
+    ctx.beginPath(); ctx.moveTo(lo-18,C); ctx.lineTo(lo-18,hi); ctx.moveTo(hi+18,lo); ctx.lineTo(hi+18,C); ctx.stroke();
+    ctx.strokeStyle = s2; ctx.shadowColor = s2;
+    ctx.beginPath(); ctx.moveTo(lo,lo-18); ctx.lineTo(C,lo-18); ctx.moveTo(C,hi+18); ctx.lineTo(hi,hi+18); ctx.stroke();
+    // corner signal posts
+    [[lo-26,hi+8,s1],[hi+26,lo-8,s1],[lo-8,lo-26,s2],[hi+8,hi+26,s2]].forEach(function(p){
+      ctx.shadowColor = p[2]; ctx.shadowBlur = 20; ctx.fillStyle = p[2];
+      ctx.beginPath(); ctx.arc(p[0],p[1],6,0,Math.PI*2); ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+    // cars
+    lanes.forEach(function(l){
+      l.cars.forEach(function(car){
+        var x = l.x0 + l.dx*car.s, y = l.y0 + l.dy*car.s;
+        ctx.save(); ctx.translate(x,y); ctx.rotate(Math.atan2(l.dy,l.dx));
+        // car drawn pointing +x, front at x=0
+        ctx.fillStyle = 'rgba(0,0,0,.3)'; rr(-CAR+2,-9,CAR,20,6); ctx.fill();
+        ctx.fillStyle = car.col; rr(-CAR,-10,CAR,20,6); ctx.fill();
+        ctx.fillStyle = 'rgba(20,30,40,.75)'; rr(-CAR+15,-7,8,14,2); ctx.fill(); rr(-CAR+4,-7,5,14,2); ctx.fill();
+        ctx.fillStyle = '#FFF6C2'; ctx.fillRect(-3,-8,3,4); ctx.fillRect(-3,4,3,4);
+        if (car.v < 30){ ctx.fillStyle = '#FF2D46'; ctx.shadowColor = '#FF2D46'; ctx.shadowBlur = 8;
+          ctx.fillRect(-CAR,-8,3,4); ctx.fillRect(-CAR,4,3,4); ctx.shadowBlur = 0; }
+        ctx.restore();
+      });
+    });
+  }
+
+  // a calm starting frame so the scene is never empty
+  for (var w = 0; w < 240; w++) update(1/30);
+  var lastT = null, visible = true;
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){ visible = es[0].isIntersecting; }).observe(cv);
+  }
+  function frame(t){
+    if (lastT === null) lastT = t;
+    var dt = Math.min(.05, (t - lastT)/1000); lastT = t;
+    if (visible){ update(dt); dashOffset = (dashOffset + dt*30) % 30; drawScene(); }
+    requestAnimationFrame(frame);
+  }
+  drawScene();
+  if (!reduce) requestAnimationFrame(frame);
 })();
 </script>
 </body>
