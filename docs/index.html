@@ -240,7 +240,7 @@ T1:05 T2:03</pre></div>
   <h2>How it is built</h2>
   <p class="intro">The firmware is built bottom-up, one layer at a time, and each layer is tested before the next one is added. Only the module layer touches the HAL.</p>
   <div class="stack reveal">
-    <div class="layer"><span class="n">1</span><div><h3>Hardware</h3><p>STM32F103RB, two light modules on D3–D6, four buttons on D7–D10, DHT20 and LCD on I2C1, TIM2 tick every 10 ms.</p></div></div>
+    <div class="layer"><span class="n">1</span><div><h3>Hardware</h3><p>STM32F103RB, light modules on PB3, PB5, PB4, PB10, buttons on PA8, PA9, PC7, PB6, DHT20 and LCD on I2C1 (PB8, PB9), TIM2 tick every 10 ms.</p></div></div>
     <div class="layer"><span class="n">2</span><div><h3>O(1) scheduler</h3><p>Delta-sorted task list so <code>SCH_Update</code> only checks the head task. Supports periodic and one-shot tasks.</p><div class="ticks" id="ticks" aria-hidden="true"></div></div></div>
     <div class="layer"><span class="n">3</span><div><h3>Supporting modules</h3><p>Software timer, debounced buttons, traffic light driver, DHT20 and LCD drivers, each as a <code>.h/.c</code> pair.</p></div></div>
     <div class="layer"><span class="n">4</span><div><h3>State machines</h3><p><code>fsm_automatic</code>, <code>fsm_manual</code>, <code>fsm_tuning</code> and a mode switcher, running as scheduler tasks with no direct hardware access.</p></div></div>
@@ -275,7 +275,7 @@ T1:05 T2:03</pre></div>
           <tr><td><span class="swatch" style="background:var(--red)"></span>Traffic light module 2</td><td>D5, D6</td></tr>
           <tr><td><span class="swatch" style="background:var(--amber)"></span>Button module 1</td><td>D7, D8</td></tr>
           <tr><td><span class="swatch" style="background:var(--amber)"></span>Button module 2</td><td>D9, D10</td></tr>
-          <tr><td><span class="swatch" style="background:var(--blue)"></span>DHT20 and LCD</td><td>I2C slot (red)</td></tr>
+          <tr><td><span class="swatch" style="background:var(--blue)"></span>DHT20 and LCD</td><td>I2C slot (red), PB8 and PB9</td></tr>
           <tr><td><span class="swatch" style="background:var(--green)"></span>On-board LEDs, USER button</td><td>PA5, PC9, PC13</td></tr>
         </tbody>
       </table>
@@ -285,14 +285,15 @@ T1:05 T2:03</pre></div>
         <caption>Pin mapping</caption>
         <thead><tr><th>Header</th><th>STM32 pin</th><th>Label</th></tr></thead>
         <tbody>
-          <tr><td>D3</td><td class="tbd">from schematic</td><td>TL1_A</td></tr>
-          <tr><td>D4</td><td class="tbd">from schematic</td><td>TL1_B</td></tr>
-          <tr><td>D5</td><td class="tbd">from schematic</td><td>TL2_A</td></tr>
-          <tr><td>D6</td><td class="tbd">from schematic</td><td>TL2_B</td></tr>
-          <tr><td>D7</td><td class="tbd">from schematic</td><td>BTN_1</td></tr>
-          <tr><td>D8</td><td class="tbd">from schematic</td><td>BTN_2</td></tr>
-          <tr><td>D9</td><td class="tbd">from schematic</td><td>BTN_3</td></tr>
-          <tr><td>D10</td><td class="tbd">from schematic</td><td>BTN_4</td></tr>
+          <tr><td>D3</td><td>PB3</td><td>TL1_A</td></tr>
+          <tr><td>D4</td><td>PB5</td><td>TL1_B</td></tr>
+          <tr><td>D5</td><td>PB4</td><td>TL2_A</td></tr>
+          <tr><td>D6</td><td>PB10</td><td>TL2_B</td></tr>
+          <tr><td>D7</td><td>PA8</td><td>BTN_1</td></tr>
+          <tr><td>D8</td><td>PA9</td><td>BTN_2</td></tr>
+          <tr><td>D9</td><td>PC7</td><td>BTN_3</td></tr>
+          <tr><td>D10</td><td>PB6</td><td>BTN_4</td></tr>
+          <tr><td>SCL, SDA</td><td>PB8, PB9</td><td>I2C1</td></tr>
         </tbody>
       </table>
     </div>

@@ -27,23 +27,33 @@ Project page: https://tapstoptap.github.io/MCU-MPU-Project/
 | Traffic light module 2 | D5 – D6 | 2 signals → 4 states |
 | Button module 1 | D7 – D8 | 2 buttons, direct GPIO |
 | Button module 2 | D9 – D10 | 2 buttons, direct GPIO |
-| DHT20 sensor, LCD | I2C slot (red) | I2C1 |
+| DHT20 sensor, LCD | I2C slot (red) | I2C1, PB8 = SCL, PB9 = SDA |
 | On-board LEDs / USER button | PA5, PC9 / PC13 | Built into the board |
 
 ### Pin mapping
 
-Filled in from the board schematic (report section 3.1).
+Read from the Arduino header schematic in the course guide (Figure 2), reused in report section 3.1.
 
 | Arduino pin | STM32 pin | GPIO mode | User Label |
 |---|---|---|---|
-| D3 | `Pxx` | Output Push-Pull | `TL1_A` |
-| D4 | `Pxx` | Output Push-Pull | `TL1_B` |
-| D5 | `Pxx` | Output Push-Pull | `TL2_A` |
-| D6 | `Pxx` | Output Push-Pull | `TL2_B` |
-| D7 | `Pxx` | Input | `BTN_1` |
-| D8 | `Pxx` | Input | `BTN_2` |
-| D9 | `Pxx` | Input | `BTN_3` |
-| D10 | `Pxx` | Input | `BTN_4` |
+| D3 | PB3 | Output Push-Pull | `TL1_A` |
+| D4 | PB5 | Output Push-Pull | `TL1_B` |
+| D5 | PB4 | Output Push-Pull | `TL2_A` |
+| D6 | PB10 | Output Push-Pull | `TL2_B` |
+| D7 | PA8 | Input | `BTN_1` |
+| D8 | PA9 | Input | `BTN_2` |
+| D9 | PC7 | Input | `BTN_3` |
+| D10 | PB6 | Input | `BTN_4` |
+| SCL | PB8 | I2C1 SCL | DHT20 + LCD |
+| SDA | PB9 | I2C1 SDA | DHT20 + LCD |
+
+Notes:
+- D3 (PB3) and D5 (PB4) are JTAG pins by default. Setting **SYS → Debug = Serial Wire**
+  releases them as normal GPIO, so this setting is required for traffic light module 1 and 2 to work.
+- I2C1 on PB8/PB9 is the remapped I2C1 position; selecting PB8 = I2C1_SCL and PB9 = I2C1_SDA
+  in the `.ioc` pinout applies the remap automatically.
+- The button input pull configuration (no pull / pull-up) is set after the logic level is
+  measured in hardware test 3.3.
 
 ### Light signal combinations
 
@@ -87,7 +97,8 @@ Requirements: STM32CubeIDE, XNUCLEO-F103RB board, USB cable.
    git clone https://github.com/tapstoptap/MCU-MPU-Project.git
    ```
 2. In STM32CubeIDE: **File → Import → Existing Projects into Workspace**, select the cloned folder.
-3. Open the `.ioc` file and check **System Core → SYS → Debug = Serial Wire**.
+3. Open the `.ioc` file and check **System Core → SYS → Debug = Serial Wire**
+   (this also frees PB3 and PB4 for the traffic lights).
    If the `Drivers/` folder is missing, use **Project → Generate Code**.
 4. Build with **Project → Build Project** (Debug configuration).
 5. Connect the board and use **Run → Run** to flash.
