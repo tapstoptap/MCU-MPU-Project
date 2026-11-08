@@ -26,3 +26,7 @@ desktop.ini
 # Report build files (keep only the final PDF)
 *.docx#
 ~$*.docx
+
+# Course materials (kept local)
+Project_Announcement_CO3009*.pdf
+Template_Report_BTL_CO3009*.docx
