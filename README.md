@@ -115,7 +115,7 @@ _To be completed after the state machines are finalized (button roles, mode swit
 | Name | Student ID | GitHub |
 |---|---|---|
 | Nguyễn Minh Phúc | 2453005 | [@tapstoptap](https://github.com/tapstoptap) |
-| Võ Lê Thành Triệu | 2453297 | … |
+| Võ Lê Thành Triệu | 2453297 | [@volethanhtrieu](https://github.com/volethanhtrieu) |
 | Nguyễn Minh Quang | 2453052 | … |
 
 ## Submission
