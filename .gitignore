@@ -30,3 +30,7 @@ desktop.ini
 # Course materials (kept local)
 Project_Announcement_CO3009*.pdf
 Template_Report_BTL_CO3009*.docx
+
+# CMake build output (VS Code + STM32Cube extension)
+build/
+mx.scratch
