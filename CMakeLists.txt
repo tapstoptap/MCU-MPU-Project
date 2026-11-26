@@ -47,6 +47,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Src/scheduler.c
     Core/Src/global.c
+    Core/Src/fsm_mode.c
 )
 
 # Add include paths
