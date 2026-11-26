@@ -78,7 +78,9 @@ Core/
 │   ├── lcd.h
 │   ├── fsm_automatic.h
 │   ├── fsm_manual.h
-│   └── fsm_tuning.h
+│   ├── fsm_tuning.h
+│   ├── fsm_mode.h          mode switching + idle timeout
+│   └── display.h           lcd screens per mode
 └── Src/                    matching .c files
 docs/                       project page (GitHub Pages)
 report/                     final report PDF
@@ -121,7 +123,29 @@ XNUCLEO-F103RB board, micro-USB cable.
 
 ## How to operate
 
-_To be completed after the state machines are finalized (button roles, mode switching, LCD screens)._
+After reset the system starts in **AUTO**: both roads RED for 2 s, then the normal cycle.
+Default durations: RED 5 s, GREEN 3 s, AMBER 2 s (always RED = GREEN + AMBER). LED_2 (PC9) blinks
+every 0.5 s while the scheduler is running.
+
+| Button | AUTO | MANUAL | TUNING |
+|---|---|---|---|
+| `BTN_1` (D7) | → MANUAL | → TUNING | → AUTO (cancel, nothing saved) |
+| `BTN_2` (D8) | – | Next phase (through AMBER) | Select field R → G → A |
+| `BTN_3` (D9) | – | – | +1 s (hold 1 s = repeat every 0.2 s) |
+| `BTN_4` (D10) | – | – | −1 s (hold 1 s = repeat every 0.2 s) |
+| `USER` (PC13) | – | – | Save (only if R = G + A) |
+| no button for 60 s | – | → AUTO | → AUTO (cancel) |
+
+| Mode | LCD line 1 | LCD line 2 |
+|---|---|---|
+| AUTO | `AUTO 1:R04 2:G02` (countdown per road) | `T:28.5°C H:65.2%` |
+| MANUAL | `MANUAL  B2=Next` / `MANUAL  (amber)` | `1:RED   2:GREEN` |
+| TUNING | `TUNE RED  : 05s` | `R05 G03 A02 U=OK` |
+| TUNING, invalid save | `ERR: R != G+A` | `R=06 G+A=05` |
+| TUNING, saved | `SAVED!` | `R06 G04 A02` |
+
+Safety: no phase has both roads GREEN; when changing mode a GREEN road always goes through
+AMBER first; TUNING flashes AMBER on both roads. Each value is limited to 1–99 s.
 
 ## Team
 
