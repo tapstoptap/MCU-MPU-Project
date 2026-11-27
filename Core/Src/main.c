@@ -26,6 +26,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "scheduler.h"
+#include "software_timer.h"
+#include "button.h"
+#include "traffic_light.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +60,10 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/* ===== 10 ms system tasks ===== */
+void task_button_read(void) { button_read(); }
+void task_timer_run(void)   { timer_run(); }
+
 /* ===== LED PC9 heartbeat = system alive ===== */
 void task_heartbeat(void)
 {
@@ -99,8 +106,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
   /* init (before the scheduler starts) */
   SCH_Init();
+  timer_init();
+  button_init();
+  traffic_init();
 
   /* tasks */
+  SCH_Add_Task(task_button_read, 0, 1);       // every 10 ms
+  SCH_Add_Task(task_timer_run, 0, 1);         // every 10 ms
   SCH_Add_Task(task_heartbeat, 0, 50);        // every 500 ms
 
   /* start the 10 ms tick (always last) */

@@ -59,10 +59,10 @@ Notes:
 
 | Signal A | Signal B | Light state |
 |---|---|---|
-| 0 | 0 | … |
-| 0 | 1 | … |
-| 1 | 0 | … |
-| 1 | 1 | … |
+| 0 | 0 | Off |
+| 0 | 1 | Amber |
+| 1 | 0 | Green |
+| 1 | 1 | Red |
 
 ## Project structure
 
