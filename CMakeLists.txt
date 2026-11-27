@@ -49,6 +49,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/software_timer.c
     Core/Src/button.c
     Core/Src/traffic_light.c
+    Core/Src/lcd.c
+    Core/Src/dht20.c
 )
 
 # Add include paths
