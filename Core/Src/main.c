@@ -29,6 +29,8 @@
 #include "software_timer.h"
 #include "button.h"
 #include "traffic_light.h"
+#include "lcd.h"
+#include "dht20.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,6 +65,27 @@ void SystemClock_Config(void);
 /* ===== 10 ms system tasks ===== */
 void task_button_read(void) { button_read(); }
 void task_timer_run(void)   { timer_run(); }
+
+/* ===== DHT20 reading: trigger every 2 s, read with a ONE-SHOT task 100 ms later ===== */
+static uint8_t dht_read_retry = 0;
+
+void task_dht20_read(void)
+{
+  dht20_status_t st = dht20_read_measure();
+  if (st == DHT20_ERR_BUSY && dht_read_retry < 5) {   // not finished -> try again in 20 ms
+    dht_read_retry++;
+    SCH_Add_Task(task_dht20_read, 2, 0);
+    return;
+  }
+  dht_read_retry = 0;
+}
+
+void task_dht20_trigger(void)
+{
+  if (dht20_start_measure() == DHT20_OK) {
+    SCH_Add_Task(task_dht20_read, 10, 0);            // ONE-SHOT, 10 ticks = 100 ms
+  }
+}
 
 /* ===== LED PC9 heartbeat = system alive ===== */
 void task_heartbeat(void)
@@ -109,10 +132,13 @@ int main(void)
   timer_init();
   button_init();
   traffic_init();
+  lcd_init();
+  dht20_init();
 
   /* tasks */
   SCH_Add_Task(task_button_read, 0, 1);       // every 10 ms
   SCH_Add_Task(task_timer_run, 0, 1);         // every 10 ms
+  SCH_Add_Task(task_dht20_trigger, 100, 200); // first at 1 s, then every 2 s
   SCH_Add_Task(task_heartbeat, 0, 50);        // every 500 ms
 
   /* start the 10 ms tick (always last) */

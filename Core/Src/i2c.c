@@ -112,6 +112,51 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 }
 
 /* USER CODE BEGIN 1 */
+static void i2c1_short_delay(void)
+{
+  for (volatile uint32_t d = 0; d < 160; d++) { __NOP(); }
+}
 
+/* Recover STM32F1 I2C1 if BUSY latch or slave SDA hold occurs (e.g. hot-unplug) */
+void i2c1_recover(void)
+{
+  if (hi2c1.State == HAL_I2C_STATE_READY &&
+      __HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_BUSY) == RESET) {
+    return;
+  }
+
+  HAL_I2C_DeInit(&hi2c1);
+
+  /* Clock out up to 9 SCL pulses on PB8 to release any slave holding SDA (PB9) */
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin   = GPIO_PIN_8 | GPIO_PIN_9;
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET);
+  i2c1_short_delay();
+
+  for (uint8_t i = 0; i < 9; i++) {
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
+    i2c1_short_delay();
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+    i2c1_short_delay();
+  }
+
+  /* Generate STOP condition: SDA low -> SCL high -> SDA high */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+  i2c1_short_delay();
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+  i2c1_short_delay();
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
+  i2c1_short_delay();
+
+  __HAL_RCC_I2C1_FORCE_RESET();
+  i2c1_short_delay();
+  __HAL_RCC_I2C1_RELEASE_RESET();
+
+  MX_I2C1_Init();
+}
 /* USER CODE END 1 */
 
