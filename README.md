@@ -54,6 +54,7 @@ Notes:
   in the `.ioc` pinout applies the remap automatically.
 - The button input pull configuration (no pull / pull-up) is set after the logic level is
   measured in hardware test 3.3.
+- LCD backpack (PCF8574) found at I2C address `0x21` on our board; `lcd_init()` also probes 0x27, 0x3F, 0x20–0x26 and 0x39–0x3E. DHT20 is fixed at `0x38`.
 
 ### Light signal combinations
 
