@@ -56,6 +56,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/fsm_manual.c
     Core/Src/fsm_tuning.c
     Core/Src/display.c
+    Core/Src/fsm_mode.c
 )
 
 # Add include paths
