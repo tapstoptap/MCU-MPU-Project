@@ -31,6 +31,9 @@
 #include "traffic_light.h"
 #include "lcd.h"
 #include "dht20.h"
+#include "global.h"
+#include "fsm_mode.h"
+#include "display.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -134,10 +137,14 @@ int main(void)
   traffic_init();
   lcd_init();
   dht20_init();
+  fsm_mode_init(); // start in AUTO: ALL RED 2 s -> R1 G2
 
-  /* tasks */
+  /* tasks: same due time -> run in this order: buttons, timers, state machine
+   */
   SCH_Add_Task(task_button_read, 0, 1);       // every 10 ms
   SCH_Add_Task(task_timer_run, 0, 1);         // every 10 ms
+  SCH_Add_Task(fsm_mode_run, 0, 1);           // every 10 ms
+  SCH_Add_Task(display_run, 5, 10);           // every 100 ms
   SCH_Add_Task(task_dht20_trigger, 100, 200); // first at 1 s, then every 2 s
   SCH_Add_Task(task_heartbeat, 0, 50);        // every 500 ms
 
